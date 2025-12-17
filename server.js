@@ -19,7 +19,7 @@ const mongoose = require("mongoose");
 const app = express();
 //http server object to be hosted on render
 const server = http.createServer(app);
-//constructs io as socket object
+//constructs io as socket server object
 const io = new Server(server);
 
 //---------Mongoose Connection---------
