@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Geopardy Multiplayer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+<body>
+  <h1>Geopardy Multiplayer</h1>
+
+  <!-- LOBBY VIEW -->
+  <div id="lobbyView">
+    <div class="panel">
+      <label>
+        Room code:
+        <input id="roomInput" placeholder="e.g. room1" />
+      </label>
+      <!--calls function in client.js file-->>
+      <button id="joinButton" onclick="joinRoom()">Join Room</button>
+    </div>
+  </div>
+
+  <!-- ROOM VIEW (hidden at first) -->
+  <div id="roomView" style="display: none;">
+    <h2>Room: <span id="roomName"></span></h2>
+
+    <div class="panel">
+      <label>
+        Message:
+        <input id="msgInput" placeholder="Type a test message" />
+      </label>
+      <button onclick="sendMsg()">Send</button>
+    </div>
+
+    <pre id="log"></pre>
+
+    <!-- (Optional) Leave button to go back to lobby later -->
+    <!-- <button onclick="leaveRoom()">Leave Room</button> -->
+  </div>
+
+  <!-- Socket.IO client library -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>

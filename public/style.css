@@ -1,0 +1,37 @@
+/*probably find some ai for css*/
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 16px;
+}
+
+.panel {
+  margin-bottom: 12px;
+}
+
+input {
+  padding: 4px 6px;
+  margin-left: 4px;
+}
+
+button {
+  margin-left: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+pre#log {
+  margin-top: 16px;
+  padding: 10px;
+  background: #020617;
+  border-radius: 4px;
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #374151;
+}
