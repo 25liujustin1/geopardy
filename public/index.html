@@ -8,14 +8,27 @@
 <body>
   <h1>Geopardy!</h1>
 
+<input id ="usernameInput" placeholder="Choose a nickname!"/>
+<div id = "usernamePage">
+  <div class = "buttons">
+  <button id ="setUsernameButton" onclick="setUsername()">Quick Start</button>
+  <button id ="openLobbiesButton" onclick="lobbiesPopup()">Lobbies</button>
+  </div>
+</div>
+
+<div id = "lobbiesPopup" style = "display: none;">
+  <button>Join Lobby</button>
+  <button>Create Lobby</button>
+</div>
+
   <!-- LOBBY VIEW -->
-  <div id="lobbyView">
+  <div id="lobbyView" style = "display: none;">
     <div class="panel">
       <label>
         Room code:
         <input id="roomInput" placeholder="e.g. room1" />
       </label>
-      <!--calls function in client.js file-->>
+      <!--calls function in client.js file-->
       <button id="joinButton" onclick="joinRoom()">Join Room</button>
     </div>
   </div>

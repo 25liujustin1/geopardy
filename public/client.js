@@ -1,8 +1,25 @@
 //intializes client side socket that communicates with server socket via shared socket id
 const socket = io();
 let currentRoom = null; // which room this player is in
+let username = null;
 
 //we call this function in html, and this function calls socket in server.js
+
+function setUsername(){
+  username = document.getElementById("usernameInput").value.trim();
+  if(!username){
+    alert("Please enter an username");
+    return;
+  }
+
+  document.getElementById("usernamePage").style.display = "none";
+  document.getElementById("lobbyView").style.display = "block";
+}
+
+function lobbiesPopup(){
+  document.getElementById("lobbiesPopup").style.display = "block";
+}
+
 function joinRoom() {
   const room = document.getElementById("roomInput").value.trim();
   if (!room) {

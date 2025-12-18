@@ -2,13 +2,84 @@
 
 body {
   font-family: system-ui, sans-serif;
-  background: #111827;
   color: #e5e7eb;
   padding: 20px;
+  background: url('geopardyBackground.png');
 }
 
 h1 {
-  margin-bottom: 16px;
+  font-family: 'Comic Sans MS', sans-serif;
+  font-size: 75px;
+  color: #3BA322;
+  margin-top: 125px;
+  margin-bottom: 50px;
+  height: 75px;
+  text-align: center;
+}
+
+#usernamePage {
+  display: flex;
+  flex-direction: column;   /* stack label + input + button vertically */
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;       /* centers the box horizontally */
+  margin-right: auto;
+}
+
+#lobbiesPopup {  
+  display: flex;
+  flex-direction: column;   /* stack label + input + button vertically */
+  justify-content: center;
+  align-items: center;
+
+  width: 300px;
+  padding: 20px;           /* inside spacing */
+  
+  border: 5px solid #84D1DF;
+  border-radius: 12px;
+  background-color: rgba(31, 41, 55, 0.8);
+  
+  margin-left: auto;       /* centers the box horizontally */
+  margin-right: auto;
+}
+
+#usernameInput {
+  width: 320px;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  align-content: center;
+  border: none;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 30px;
+}
+
+#setUsernameButton{
+  margin-bottom: 15px;
+}
+
+.buttons {
+
+  font-family: 'Comic Sans MS', sans-serif;
+  width: 300px;
+  height: 50px;
+
+  display: flex;
+  flex-direction: column;   /* stack label + input + button vertically */
+  justify-content: center;
+  align-items: center;
+
+  font-size: 20px;
+  border-radius: 8px;
+  color: white;
+}
+
+#lobbyView {
+  margin-top: 20px;
+  text-align: center;
 }
 
 .panel {
