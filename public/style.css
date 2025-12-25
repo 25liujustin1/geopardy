@@ -145,10 +145,14 @@ pre#log {
   position: relative;
   stroke: black;
   stroke-width: 3;
+  r: 21;
+  fill: #CDEAAF;
+  pointer-events: all;
+  cursor: pointer;
 }
 
 .circleRegion:hover {
-  fill: rgba(126, 215, 10, 1);
+  fill: rgba(125, 222, 88, 1);
   stroke: black;
   stroke-width: 3;
 }

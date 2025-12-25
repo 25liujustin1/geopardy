@@ -227,7 +227,17 @@ class Room{
   "Zimbabwe"
   ];
   */
-  countries = ["Libya", "Tunisia", "Egypt", "Afghanistan","Albania","Algeria","Andorra","Israel","Palestine"];
+  countries = ["Libya", "Tunisia", "Egypt","Israel","Palestine", "France","Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan"];
 
   players = [];
 
@@ -310,7 +320,7 @@ io.on("connection", function(socket) {
     roomcodes.push(roomcode);
   });
 
-  socket.on("create-room", function(roomcode){
+  socket.on("create-room", function(roomcode, username){
     const room = new Room(roomcode, socket.id);
     rooms.push(room);
     roomcodes.push(roomcode);
@@ -318,12 +328,12 @@ io.on("connection", function(socket) {
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
       "system-msg",
-      `Player ${socket.id} joined room ${roomcode}`
+      `${username} has joined room ${roomcode}`
     );
   });
 
   //if user tries to join room, then let them into room and send messages
-  socket.on("join-room", function(roomcode) {
+  socket.on("join-room", function(roomcode, username) {
     roomcode = (roomcode || "").trim();
     if (!roomcode) return;
     socket.join(roomcode);
@@ -331,7 +341,7 @@ io.on("connection", function(socket) {
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
       "system-msg",
-      `Player ${socket.id} joined room ${roomcode}`
+      `${username} has joined room ${roomcode}`
     );
   });
   
@@ -341,7 +351,7 @@ io.on("connection", function(socket) {
     const message = (data.message || "").trim();
     if (!room || !message) return;
     io.to(room).emit("msg", {
-      player: socket.id,
+      player: data.username,
       message
     });
   });

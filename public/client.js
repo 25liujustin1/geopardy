@@ -202,7 +202,17 @@ let currentCountry = null;
   "Zimbabwe"
 ];
 */
-const countryIds = ["libya", "tunisia", "egypt", "afghanistan","albania","algeria","andorra","israel","palestine", "france"];
+const countryIds = ["libya", "tunisia", "egypt","israel","palestine", "france","afghanistan",
+  "albania",
+  "algeria",
+  "andorra",
+  "angola",
+  "antigua-and-barbuda",
+  "argentina",
+  "armenia",
+  "australia",
+  "austria",
+  "azerbaijan"];
 //we call this function in html, and this function calls socket in server.js
 
 function toId(name) {
@@ -213,15 +223,17 @@ function toId(name) {
 }
 
 function intializeCountryEventListeners(){
-
   for(const countryId of countryIds){
     document.getElementById(countryId).addEventListener("click", function(){
       if(toId(currentCountry) === countryId){
         document.getElementById(countryId).style.fill = "#006B0D";
-        document.getElementById(countryId).style.border = "none";
         getNewCountry(currentRoomcode);
-      }else if(currentCountry){
-        document.getElementById(countryId).style.fill = "rgba(255, 0, 0, 0.5)";
+      }else if(currentCountry && window.getComputedStyle(document.getElementById(countryId)).fill !== "rgb(0, 107, 13)"){
+        if(document.getElementById(countryId).classList.contains("region")){
+          document.getElementById(countryId).style.fill = "rgba(255, 0, 0, 0.5)";
+        }else{
+          document.getElementById(countryId).style.fill = "rgba(227, 117, 86, 1)";
+        }
         setTimeout(function () {
         document.getElementById(countryId).style.removeProperty("fill");
       }, 750);
@@ -230,24 +242,6 @@ function intializeCountryEventListeners(){
   }
 }
 
-/*
-
-function intializeCountryEventListeners(){
-
-    document.getElementById("libya").addEventListener("click", function(){
-      if(currentCountry === "libya"){
-        getNewCountry(currentRoomcode);
-        document.getElementById("libya").style.fill = "#006B0D";
-        document.getElementById("libya").style.border = "none";
-      }else if(currentCountry){
-        document.getElementById("libya").style.fill = "rgba(255, 0, 0, 0.5)";
-        setTimeout(function () {
-        document.getElementById("libya").style.removeProperty("fill");
-      }, 750);
-      }
-  });
-}
-*/
 
 
 function randomChars(){
@@ -273,7 +267,7 @@ function createRoom(){
   document.getElementById("startGameButton").style.display = "block";
   roomcode = roomCodeGenerator();
   currentRoomcode = roomcode;
-  socket.emit("create-room", roomcode);
+  socket.emit("create-room", roomcode, username);
   socket.emit("update-roomcodes", roomcode);
   host = true;
   joinRoom(false);
@@ -321,7 +315,7 @@ function joinRoom(roomcode) {
 
   // tell server we want to join
   if(roomcode){
-    socket.emit("join-room", roomcode);
+    socket.emit("join-room", roomcode, username);
     currentRoomcode = roomcode;
   }
 
@@ -344,13 +338,13 @@ function startGame() {
 function sendMsg() {
   const message = document.getElementById("msgInput").value.trim();
 
-  if (!currentRoom) {
+  if (!currentRoomcode) {
     alert("Join a room first");
     return;
   }
   if (!message) return;
 
-  socket.emit("msg", { room: currentRoom, message: message });
+  socket.emit("msg", { room: currentRoomcode, message: message, username: username});
   document.getElementById("msgInput").value = "";
 }
 
