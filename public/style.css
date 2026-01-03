@@ -86,26 +86,68 @@ button {
   cursor: pointer;
 }
 
+#gameContainer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  height: 100vh; /* full viewport height */
+  max-height: 100vh;
+  overflow: hidden; /* prevents container from growing */
+}
+
+#roomView {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* fills the grid cell */
+  max-height: 100%;
+  overflow: hidden; /* contains the children */
+}
+
+#gameContainer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  height: 100vh; /* full viewport height */
+  max-height: 100vh;
+  overflow: hidden; /* prevents container from growing */
+}
+
+#roomView {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* fills the grid cell */
+  max-height: 100%;
+  overflow: hidden; /* contains the children */
+}
+
 pre#log {
+  flex: 1;
   margin-top: 16px;
   padding: 10px;
   background: #020617;
   border-radius: 4px;
-  height: 200px;
   overflow-y: auto;
   border: 1px solid #374151;
+  min-height: 0;
+  
+  /* Text wrapping */
+  white-space: pre-wrap; /* preserves line breaks but allows wrapping */
+  word-wrap: break-word; /* breaks long words if needed */
+  overflow-wrap: break-word; /* modern version of word-wrap */
 }
 
 #map {
   position: relative;
-  width: 100%;
-  max-width: 100vw;   /* fits screen width */
+  height: 105vh;
+  width: fit-content; /* shrinks to fit the image */
+  margin-left: 0;
 }
 
 #pngMap {
-  width: 100%;
-  height: auto;
+  height: 100%;
+  width: auto;
   display: block;
+  margin-left: 0;
 }
 
 .map-svg {
@@ -130,6 +172,7 @@ pre#log {
   pointer-events: all;
 }
 
+
 .region {
   fill: transparent;
   cursor: pointer;
@@ -145,7 +188,7 @@ pre#log {
   position: relative;
   stroke: black;
   stroke-width: 3;
-  r: 21;
+  r: 15;
   fill: #CDEAAF;
   pointer-events: all;
   cursor: pointer;
