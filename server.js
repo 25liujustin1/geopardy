@@ -196,7 +196,7 @@ class Room{
 "The Solomon Islands",
 "Somalia",
 "South Africa",
-"Sout Korea",
+"South Korea",
 "South Sudan",
 "Spain",
 "Sri Lanka",
