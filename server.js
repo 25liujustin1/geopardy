@@ -26,6 +26,7 @@ const io = new Server(server);
 class Room{
 
   constructor(roomcode, host){
+    this.players = [host];
     this.roomcode = roomcode;
     this.host = host;
   }
@@ -234,31 +235,39 @@ class Room{
 "Zambia",
 "Zimbabwe"
   ];
-  
-
-  players = [];
 
 }
 
-let rooms = [];
+const map = new Map();
+//key is roomcode
+//value is room
 
-let roomcodes = [];
 
-function isRoom(input){
-  for(const roomCode of roomcodes){
-    if(input == roomCode){
-      return true;
+function removePlayer(id){
+  for (const [roomcode, room] of map.entries()) {
+    room.players = room.players.filter(p => p !== id);
+
+    if (room.players.length === 0) {
+      map.delete(roomcode);
+      continue;
+    }
+
+    // optional: if host left, reassign host
+    if (room.host === id) {
+      room.host = room.players[0]; // or null if you prefer
     }
   }
-  return false;
 }
 
-function getRoom(Roomcode){
-  for(const room of rooms){
-    if(room.roomcode === Roomcode){
-      return room;
-    }
-  }
+
+
+
+function isRoom(roomcode){
+  return map.has(roomcode);
+}
+
+function getRoom(roomcode){
+  return map.get(roomcode);
 }
 
 
@@ -316,8 +325,8 @@ io.on("connection", function(socket) {
 
   socket.on("create-room", function(roomcode, username){
     const room = new Room(roomcode, socket.id);
-    rooms.push(room);
-    roomcodes.push(roomcode);
+
+    map.set(roomcode, room);
     socket.join(roomcode);
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
@@ -335,12 +344,8 @@ io.on("connection", function(socket) {
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
       "system-msg",
-      `${username} has joined room ${roomcode}`
+      `${username} has joined`
     );
-  });
-
-  socket.on("leave-room", function(){
-
   });
   
   //if user sends message, send message to room
@@ -353,13 +358,17 @@ io.on("connection", function(socket) {
       message
     });
   });
+
+  socket.on("playerLeft", function(username){
+    io.to(room).emit("system-msg",`${username} has left`)
+  })
   
   //if user disconnections, log that
   socket.on("disconnect", function() {
     console.log("Player disconnected:", socket.id);
-  });
+    removePlayer(socket.id);
 
-
+});
 });
 
 

@@ -4,10 +4,12 @@ let currentRoomcode = null; // which room this player is in
 let username = null;
 let host = false;
 let currentCountry = null;
+let points = null;
 
 setInterval(() => {
   fetch("/ping").catch(() => {});
 }, 5 * 60 * 1000); // every 5 minutes
+
 
 
 const countryIds = ["afghanistan",
@@ -215,8 +217,15 @@ const countryIds = ["afghanistan",
 ];
 //we call this function in html, and this function calls socket in server.js
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
   intializeCountryEventListeners();
+});
+
+document.getElementById("msgInput").addEventListener("keydown", function(event){
+    if (event.key === "Enter") {
+    event.preventDefault(); // prevents form submit / newline
+    sendMsg();
+  }
 });
 
 
@@ -333,6 +342,7 @@ function joinRoom(roomcode) {
   document.getElementById("usernameInput").style.display = "none";
   document.querySelector("h1").style.display = "none";
   document.getElementById("gameContainer").style.display = "grid";
+  document.getElementById("scoreTable").style.display = "table";
   document.getElementById("roomName").textContent = currentRoomcode;
 
   appendLog("You joined room: " + currentRoomcode);

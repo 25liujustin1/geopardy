@@ -203,3 +203,11 @@ pre#log {
   stroke: black;
   stroke-width: 3;
 }
+
+#scoreTable {
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  transform: translateY(-50%); /* optional: centers vertically */
+  z-index: 2; /* ensures it's above the image */
+}

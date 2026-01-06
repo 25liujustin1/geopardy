@@ -39,6 +39,25 @@
   </div>
 </div>
 
+<table id="scoreTable" style ="display: none;">
+  <thead>
+    <tr>
+      <th>Player</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>Alice</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+
+<div id = "countdown">1wwwwwwwww</div>
+
+
   <!-- ROOM VIEW (hidden at first) -->
   <div id="gameContainer" style="display: none;">
 
@@ -2675,11 +2694,7 @@
     <h3>Room: <span id="roomName"></span></h3>
 
     <div class="panel">
-      <label>
-        Message:
-        <input id="msgInput" placeholder="Type a test message" />
-      </label>
-      <button onclick="sendMsg()">Send</button>
+      <input id="msgInput" placeholder="Type a test message" />
     </div>
 
     <pre id="log"></pre>
