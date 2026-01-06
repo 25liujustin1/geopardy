@@ -5,6 +5,11 @@ let username = null;
 let host = false;
 let currentCountry = null;
 
+setInterval(() => {
+  fetch("/ping").catch(() => {});
+}, 5 * 60 * 1000); // every 5 minutes
+
+
 const countryIds = ["afghanistan",
 "albania",
 "algeria",
@@ -210,6 +215,11 @@ const countryIds = ["afghanistan",
 ];
 //we call this function in html, and this function calls socket in server.js
 
+document.addEventListener("DOMContentLoaded", () => {
+  intializeCountryEventListeners();
+});
+
+
 function toId(name) {
   return name
     .toLowerCase()
@@ -227,7 +237,7 @@ function intializeCountryEventListeners(){
         if(document.getElementById(countryId).classList.contains("circleRegion")){
           document.getElementById(countryId).style.stroke ="none";
         }
-        getNewCountry(currentRoomcode);
+        getNewCountry();
       }else if(currentCountry && window.getComputedStyle(document.getElementById(countryId)).fill !== "rgb(0, 107, 13)"){
         if(document.getElementById(countryId).classList.contains("region")){
           document.getElementById(countryId).style.fill = "rgba(255, 0, 0, 0.5)";
@@ -268,7 +278,6 @@ function createRoom(){
   roomcode = roomCodeGenerator();
   currentRoomcode = roomcode;
   socket.emit("create-room", roomcode, username);
-  socket.emit("update-roomcodes", roomcode);
   host = true;
   joinRoom(false);
 } 
@@ -327,8 +336,6 @@ function joinRoom(roomcode) {
   document.getElementById("roomName").textContent = currentRoomcode;
 
   appendLog("You joined room: " + currentRoomcode);
-
-  intializeCountryEventListeners();
 }
 
 function startGame() {

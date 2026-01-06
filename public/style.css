@@ -27,6 +27,10 @@ h2 {
   color: black;
 }
 
+h3 {
+  color: black;
+}
+
 #mainPage, #lobbiesPopup, .buttons {
   margin: 0 auto;
 }

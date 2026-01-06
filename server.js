@@ -17,6 +17,7 @@ const mongoose = require("mongoose");
 
 //constructs app as express object
 const app = express();
+app.get("/ping", (req, res) => res.send("ok"));
 //http server object to be hosted on render
 const server = http.createServer(app);
 //constructs io as socket server object
@@ -312,9 +313,6 @@ io.on("connection", function(socket) {
     callback(isRoom(attemptRoomcode));
   });
 
-  socket.on("update-roomcodes", function(roomcode){
-    roomcodes.push(roomcode);
-  });
 
   socket.on("create-room", function(roomcode, username){
     const room = new Room(roomcode, socket.id);
@@ -339,6 +337,10 @@ io.on("connection", function(socket) {
       "system-msg",
       `${username} has joined room ${roomcode}`
     );
+  });
+
+  socket.on("leave-room", function(){
+
   });
   
   //if user sends message, send message to room
