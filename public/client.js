@@ -4,7 +4,7 @@ let currentRoomcode = null; // which room this player is in
 let username = null;
 let host = false;
 let currentCountry = null;
-let points = null;
+let startTime = null;
 
 setInterval(() => {
   fetch("/ping").catch(() => {});
@@ -228,6 +228,28 @@ document.getElementById("msgInput").addEventListener("keydown", function(event){
   }
 });
 
+function clearTable() {
+  const tbody = document.querySelector("#scoreTable tbody");
+  tbody.innerHTML = "";
+}
+
+function addRow(player, points) {
+  const tbody = document.querySelector("#scoreTable tbody");
+
+  const row = document.createElement("tr");
+
+  const nameCell = document.createElement("td");
+  nameCell.textContent = player;
+
+  const pointsCell = document.createElement("td");
+  pointsCell.textContent = points;
+
+  row.appendChild(nameCell);
+  row.appendChild(pointsCell);
+
+  tbody.appendChild(row);
+}
+
 
 function toId(name) {
   return name
@@ -241,7 +263,16 @@ function toId(name) {
 function intializeCountryEventListeners(){
   for(const countryId of countryIds){
     document.getElementById(countryId).addEventListener("click", function(){
+      let pointGain = 0;
       if(toId(currentCountry) === countryId){
+        if(Date.now() - startTime <= 2000){
+          pointGain += 10;
+        }else if(Date.now() - startTime <= 4000){
+          pointGain += 7;
+        }else{
+          pointGain += 5; 
+        }
+        socket.emit("update-scores", currentRoomcode, pointGain);
         document.getElementById(countryId).style.fill = "#006B0D";
         if(document.getElementById(countryId).classList.contains("circleRegion")){
           document.getElementById(countryId).style.stroke ="none";
@@ -321,11 +352,19 @@ function getNewCountry(){
 }
 
 socket.on("new-country", function(country){
+  startTime = Date.now();
   if(currentCountry){
     document.getElementById(toId(currentCountry)).style.fill = "#006B0D";
   }
   currentCountry = country;
   document.getElementById("country").textContent = currentCountry;
+});
+
+socket.on("update-leaderboard", (entries) => {
+  clearTable();
+  for (const [, player] of entries) {
+    addRow(player.username, player.points);
+  }
 });
 
 

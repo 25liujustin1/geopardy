@@ -25,8 +25,9 @@ const io = new Server(server);
 
 class Room{
 
-  constructor(roomcode, host){
-    this.players = [host];
+  constructor(roomcode, host, hostUsername){
+    this.players = new Map();
+    this.players.set(host, {username: hostUsername, points: 0})
     this.roomcode = roomcode;
     this.host = host;
   }
@@ -245,20 +246,31 @@ const map = new Map();
 
 function removePlayer(id){
   for (const [roomcode, room] of map.entries()) {
-    room.players = room.players.filter(p => p !== id);
+    if(room.players.has(id)){
+      room.players.delete(id);
+    }
 
-    if (room.players.length === 0) {
+    if (room.players.size === 0) {
       map.delete(roomcode);
       continue;
     }
 
     // optional: if host left, reassign host
     if (room.host === id) {
-      room.host = room.players[0]; // or null if you prefer
+      room.host = room.players.keys().next().value;
     }
   }
 }
 
+function updateLeaderboard(roomcode) {
+  const room = getRoom(roomcode);
+  
+  const sortedLeaderboard = [...room.players.entries()].sort(
+    ([, a], [, b]) => b.points - a.points
+  );
+
+  io.to(roomcode).emit("update-leaderboard", sortedLeaderboard);
+}
 
 
 
@@ -324,7 +336,7 @@ io.on("connection", function(socket) {
 
 
   socket.on("create-room", function(roomcode, username){
-    const room = new Room(roomcode, socket.id);
+    const room = new Room(roomcode, socket.id, username);
 
     map.set(roomcode, room);
     socket.join(roomcode);
@@ -340,14 +352,19 @@ io.on("connection", function(socket) {
     roomcode = (roomcode || "").trim();
     if (!roomcode) return;
     socket.join(roomcode);
-    getRoom(roomcode).players.push(socket.id);
+    getRoom(roomcode).players.set(socket.id, {username: username, points: 0});
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
       "system-msg",
       `${username} has joined`
     );
   });
-  
+
+  socket.on("update-scores", function(roomcode, points){
+    getRoom(roomcode).players.get(socket.id).points += points;
+    updateLeaderboard(roomcode);
+  });
+
   //if user sends message, send message to room
   socket.on("msg", function(data) {
     const room = (data.room || "").trim();
@@ -358,10 +375,6 @@ io.on("connection", function(socket) {
       message
     });
   });
-
-  socket.on("playerLeft", function(username){
-    io.to(room).emit("system-msg",`${username} has left`)
-  })
   
   //if user disconnections, log that
   socket.on("disconnect", function() {
