@@ -205,9 +205,46 @@ pre#log {
 }
 
 #scoreTable {
+  color: black;
   position: absolute;
-  left: 10%;
-  top: 50%;
-  transform: translateY(-50%); /* optional: centers vertically */
+  left: 9%;
+  top: 48%;
   z-index: 2; /* ensures it's above the image */
+}
+
+#timerPopup {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+  border: 7px solid #020617;
+  border-radius: 25px;
+  font-size: 180px;
+  color: black;
+  width: 350px;
+  height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;              /* important when height is fixed */
+  text-align: center;
+  background-color: rgba(31, 41, 55, 0.5);
+
+  line-height: 1;  
+}
+
+#countryPopup {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+  font-size: 90px;
+  text-align: center;
+  color: black;
 }

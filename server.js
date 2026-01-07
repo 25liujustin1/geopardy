@@ -247,6 +247,7 @@ const map = new Map();
 function removePlayer(id){
   for (const [roomcode, room] of map.entries()) {
     if(room.players.has(id)){
+      io.to(roomcode).emit("system-msg",`${room.players.get(id).username} left the room!`);
       room.players.delete(id);
     }
 
@@ -341,10 +342,6 @@ io.on("connection", function(socket) {
     map.set(roomcode, room);
     socket.join(roomcode);
     console.log(`Player ${socket.id} joined room ${roomcode}`);
-    io.to(roomcode).emit(
-      "system-msg",
-      `${username} has joined room ${roomcode}`
-    );
   });
 
   //if user tries to join room, then let them into room and send messages
@@ -356,7 +353,7 @@ io.on("connection", function(socket) {
     console.log(`Player ${socket.id} joined room ${roomcode}`);
     io.to(roomcode).emit(
       "system-msg",
-      `${username} has joined`
+      `${username} joined the room!`
     );
   });
 

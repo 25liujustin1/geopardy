@@ -5,6 +5,9 @@ let username = null;
 let host = false;
 let currentCountry = null;
 let startTime = null;
+let penaltyClock = null;
+let countdownClock = null;
+let noClickActive = false;
 
 setInterval(() => {
   fetch("/ping").catch(() => {});
@@ -250,6 +253,48 @@ function addRow(player, points) {
   tbody.appendChild(row);
 }
 
+function timer(duration, clock, callback){
+  if(clock){
+    clearInterval(clock);
+    callback(0);
+  }
+  const start = Date.now();
+  clock = setInterval(function(){
+    const elapsed = Date.now() - start;
+    const remaining = Math.ceil((duration - elapsed)/1000);
+    callback(remaining);
+    if(remaining <= 0){
+      clearInterval(clock);
+      clock = null;
+    }
+  }, 100);
+}
+
+function countdown(duration, clock){
+  const el = document.getElementById("timerPopup");
+  noClickActive = true;
+  timer(duration, clock, function(remaining){
+    if(remaining > 0){
+      el.style.display = "block";
+      el.textContent = remaining;
+    }else {
+      noClickActive = false;
+      el.textContent = "";
+      el.style.display = "none";
+    }
+  });
+}
+
+function displayCountry(country){
+  const el = document.getElementById("countryPopup");
+  el.style.display = "block";
+  el.textContent = country;
+  timer(1000, countdownClock, function(remaining){
+    if(remaining <= 0){
+      el.style.display = "none";
+    }
+  });
+}
 
 function toId(name) {
   return name
@@ -263,6 +308,9 @@ function toId(name) {
 function intializeCountryEventListeners(){
   for(const countryId of countryIds){
     document.getElementById(countryId).addEventListener("click", function(){
+      if(noClickActive){
+        return;
+      }
       let pointGain = 0;
       if(toId(currentCountry) === countryId){
         if(Date.now() - startTime <= 2000){
@@ -284,6 +332,7 @@ function intializeCountryEventListeners(){
         }else{
           document.getElementById(countryId).style.fill = "rgba(227, 117, 86, 1)";
         }
+        countdown(2000, penaltyClock);
         setTimeout(function () {
         document.getElementById(countryId).style.removeProperty("fill");
       }, 750);
@@ -312,6 +361,11 @@ function roomCodeGenerator(){
 }
 
 function createRoom(){
+  username = document.getElementById("usernameInput").value.trim();
+  if(!username){
+    alert("Please enter an username");
+    return;
+  }
   document.getElementById("mainPage").style.display = "none";
   document.getElementById("roomsPopup").style.display = "none";
   document.getElementById("startGameButton").style.display = "block";
@@ -323,6 +377,11 @@ function createRoom(){
 } 
 
 function joinRoomPrep(){
+  username = document.getElementById("usernameInput").value.trim();
+  if(!username){
+    alert("Please enter an username");
+    return;
+  }
   document.getElementById("mainPage").style.display = "none";
   document.getElementById("roomsPopup").style.display = "none";
   document.getElementById("joinRoomDisplay").style.display = "block";
@@ -356,6 +415,7 @@ socket.on("new-country", function(country){
   if(currentCountry){
     document.getElementById(toId(currentCountry)).style.fill = "#006B0D";
   }
+  displayCountry(country);
   currentCountry = country;
   document.getElementById("country").textContent = currentCountry;
 });
@@ -389,7 +449,8 @@ function joinRoom(roomcode) {
 
 function startGame() {
   document.getElementById("startGameButton").style.display = "none";
-  getNewCountry();
+  countdown(3000, countdownClock);
+  setTimeout(getNewCountry, 3000);
 }
 
 function sendMsg() {

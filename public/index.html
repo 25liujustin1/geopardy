@@ -10,7 +10,7 @@
 
 <h1>Geopardy!</h1>
 
-<input id ="usernameInput" placeholder="Choose a nickname"/>
+<input id ="usernameInput" maxlength="8" placeholder="Choose a nickname"/>
 
 <div id = "mainPage">
   <div class = "buttons">
@@ -42,20 +42,15 @@
 <table id="scoreTable" style ="display: none;">
   <thead>
     <tr>
-      <th>Player</th>
-      <th>Points</th>
+      <th colspan="2">Leaderboard</th>
     </tr>
   </thead>
 
   <tbody>
     <tr>
-      <td>Alice</td>
-      <td>12</td>
     </tr>
   </tbody>
 </table>
-
-<div id = "countdown">1wwwwwwwww</div>
 
 
   <!-- ROOM VIEW (hidden at first) -->
@@ -2687,6 +2682,8 @@
     cy="1928"
     />
   </svg>
+  <div id = "timerPopup" style="display: none;"></div>
+  <div id = "countryPopup" style="display: nonel"></div>
   </div>
     <div id="roomView">
     <button id = "startGameButton" onclick="startGame()" style = "display: none;">Start Game</button>
