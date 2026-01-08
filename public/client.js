@@ -5,9 +5,25 @@ let username = null;
 let host = false;
 let currentCountry = null;
 let startTime = null;
-let penaltyClock = null;
-let countdownClock = null;
+let clock = null;
+let activeCallback = null;
 let noClickActive = false;
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (!audioUnlocked) {
+    const audio = document.getElementById("correctDing");
+    audio.muted = false;
+    audio.play().then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+      audioUnlocked = true;
+      console.log("Audio unlocked");
+    }).catch(err => {
+      console.log("Audio unlock failed:", err);
+    });
+  }
+}
 
 setInterval(() => {
   fetch("/ping").catch(() => {});
@@ -222,6 +238,7 @@ const countryIds = ["afghanistan",
 
 document.addEventListener("DOMContentLoaded", function() {
   intializeCountryEventListeners();
+  document.body.addEventListener("click", unlockAudio, { once: true });
 });
 
 document.getElementById("msgInput").addEventListener("keydown", function(event){
@@ -253,11 +270,15 @@ function addRow(player, points) {
   tbody.appendChild(row);
 }
 
-function timer(duration, clock, callback){
+function timer(duration, callback){
   if(clock){
     clearInterval(clock);
-    callback(0);
+    clock = null;
+    if(activeCallback){
+      activeCallback(0);
+    }
   }
+  activeCallback = callback;
   const start = Date.now();
   clock = setInterval(function(){
     const elapsed = Date.now() - start;
@@ -266,14 +287,17 @@ function timer(duration, clock, callback){
     if(remaining <= 0){
       clearInterval(clock);
       clock = null;
+      if(activeCallback){
+      activeCallback(0);
+    }
     }
   }, 100);
 }
 
-function countdown(duration, clock){
+function countdown(duration){
   const el = document.getElementById("timerPopup");
   noClickActive = true;
-  timer(duration, clock, function(remaining){
+  timer(duration, function(remaining){
     if(remaining > 0){
       el.style.display = "block";
       el.textContent = remaining;
@@ -289,7 +313,7 @@ function displayCountry(country){
   const el = document.getElementById("countryPopup");
   el.style.display = "block";
   el.textContent = country;
-  timer(1000, countdownClock, function(remaining){
+  timer(1000, function(remaining){
     if(remaining <= 0){
       el.style.display = "none";
     }
@@ -303,6 +327,19 @@ function toId(name) {
     .replace(/[\u0300-\u036f]/g, "")  // Remove accent marks
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+function resetCountries(){
+  for(const country of countryIds){
+    const el = document.getElementById(country);
+    if(el.classList.contains("region")){
+      el.style.fill = "transparent";
+    }else{
+      el.style.fill = "#CDEAAF";
+      el.style.stroke = "black";
+      el.style.strokeWidth = "3px";
+    }
+  }
 }
 
 function intializeCountryEventListeners(){
@@ -332,7 +369,7 @@ function intializeCountryEventListeners(){
         }else{
           document.getElementById(countryId).style.fill = "rgba(227, 117, 86, 1)";
         }
-        countdown(2000, penaltyClock);
+        countdown(2000);
         setTimeout(function () {
         document.getElementById(countryId).style.removeProperty("fill");
       }, 750);
@@ -418,6 +455,22 @@ socket.on("new-country", function(country){
   displayCountry(country);
   currentCountry = country;
   document.getElementById("country").textContent = currentCountry;
+  if(audioUnlocked) {
+    const audio = document.getElementById("correctDing");
+    audio.currentTime = 0; // Reset to start
+    audio.play().catch(err => console.log("Audio play failed:", err));
+  }
+});
+
+socket.on("new-host", function(){
+  host = true;
+});
+
+socket.on("game-end", function(){
+  currentCountry = null;
+  document.getElementById("startGameButton").style.display = "block";
+  document.getElementById("country").style.display = "none";
+  resetCountries();
 });
 
 socket.on("update-leaderboard", (entries) => {
@@ -449,7 +502,9 @@ function joinRoom(roomcode) {
 
 function startGame() {
   document.getElementById("startGameButton").style.display = "none";
-  countdown(3000, countdownClock);
+  document.getElementById("country").style.display = "block";
+  socket.emit("update-scores", currentRoomcode, 0);
+  countdown(3000);
   setTimeout(getNewCountry, 3000);
 }
 

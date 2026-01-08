@@ -23,16 +23,7 @@ const server = http.createServer(app);
 //constructs io as socket server object
 const io = new Server(server);
 
-class Room{
-
-  constructor(roomcode, host, hostUsername){
-    this.players = new Map();
-    this.players.set(host, {username: hostUsername, points: 0})
-    this.roomcode = roomcode;
-    this.host = host;
-  }
-
-  countries = [
+const countriesKey = [
 "Afghanistan",
 "Albania",
 "Algeria",
@@ -237,6 +228,19 @@ class Room{
 "Zimbabwe"
   ];
 
+class Room{
+
+  constructor(roomcode, host, hostUsername){
+    this.players = new Map();
+    this.players.set(host, {username: hostUsername, points: 0})
+    this.roomcode = roomcode;
+    this.host = host;
+    this.countries = new Map();
+    for (const country of countriesKey) {
+      this.countries.set(country, true);
+    }
+  }
+
 }
 
 const map = new Map();
@@ -256,9 +260,10 @@ function removePlayer(id){
       continue;
     }
 
-    // optional: if host left, reassign host
     if (room.host === id) {
       room.host = room.players.keys().next().value;
+      io.to(room.host).emit("new-host");
+      io.to(roomcode).emit("system-msg", `${room.players.get(room.host).username} is the new host!`)
     }
   }
 }
@@ -285,10 +290,37 @@ function getRoom(roomcode){
 
 
 function getRandomCountry(room){
-  let x = Math.floor(Math.random()*room.countries.length);
-  let temp = room.countries[x];
-  room.countries.splice(x, 1);
-  return temp;
+  let unusedCountries = [];
+  for(const [country, state] of room.countries.entries()){
+    if(state){
+      unusedCountries.push(country);
+    }
+  }
+
+  if(unusedCountries.length === 0){
+    let maxPoints = 0;
+    let winner = null;
+    for(const player of room.players.values()){
+      if(player.points > maxPoints){
+        maxPoints = player.points;
+        winner = player.username;
+      }
+    }
+    for (const country of room.countries.keys()) {
+      room.countries.set(country, true);
+    }
+    for (const player of room.players.values()){
+      player.points = 0;
+    }
+    io.to(room.host).emit("game-end");
+    io.to(room.roomcode).emit("system-msg", `${winner} wins!\nWaiting for host to play again...`)
+    return;
+  }
+
+  let x = Math.floor(Math.random()*unusedCountries.length);
+  let pick = unusedCountries[x];
+  room.countries.set(pick, false);
+  return pick;
 }
 
 
@@ -324,11 +356,13 @@ app.use(express.static("public"));
 io.on("connection", function(socket) {
   console.log("Player connected:", socket.id);
   
-  //if connection made, begin scanning for socket events4
+  //if connection made, begin scanning for socket events
 
   socket.on("request-country", function(roomcode){
-    country = getRandomCountry(getRoom(roomcode));
-    io.to(roomcode).emit("new-country", country);
+    const country = getRandomCountry(getRoom(roomcode));
+    if(country){
+      io.to(roomcode).emit("new-country", country);
+    }
   });
   
   socket.on("roomcode-validation", function(attemptRoomcode, callback){
