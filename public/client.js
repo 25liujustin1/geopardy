@@ -470,6 +470,7 @@ socket.on("game-end", function(){
   currentCountry = null;
   document.getElementById("startGameButton").style.display = "block";
   document.getElementById("country").style.display = "none";
+  document.getElementById("country").textContent = "";
   resetCountries();
 });
 
